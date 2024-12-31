@@ -8,4 +8,6 @@ router.post('/users', criarUsuario) //  cria usuários
 router.put('/users/:id', UpdateUsuarios)
 router.delete('/users/:id', deletaUsuario) // edita o usuário identificado pelo id
 
+
+
 module.exports = router;
