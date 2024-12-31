@@ -43,10 +43,6 @@ let NotesSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
     },
-    version: {
-        type: Number,
-        default: 1
-    },
     tags: {
         type: Array
     },
