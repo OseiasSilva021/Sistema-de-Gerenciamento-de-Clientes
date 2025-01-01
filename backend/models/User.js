@@ -19,6 +19,10 @@ let UserSchema = new Schema({
         type: String,
         required: true
     },
+    endereço:{
+    type: String,
+    required: false
+    },
     empresa: {
         type: String,
         required: false

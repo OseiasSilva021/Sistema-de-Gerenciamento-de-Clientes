@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -45,6 +45,10 @@
 
         form input:focus {
             border-color: #007bff;
+        }
+
+        form input.invalid {
+            border-color: red;
         }
 
         form button {
@@ -93,80 +97,106 @@
 <body>
     <form id="registrationForm">
         <h1>Página de Registro</h1>
-        <input type="text" id="name" placeholder="Digite aqui seu nome">
+        <label for="name">Nome:</label>
+        <input type="text" id="name" name="nome" placeholder="Digite aqui seu nome">
         <div class="error" id="nameError"></div>
-        <input type="email" id="email" placeholder="Digite aqui seu email">
+
+        <label for="email">E-mail:</label>
+        <input type="email" id="email" name="email" placeholder="Digite aqui seu email">
         <div class="error" id="emailError"></div>
-        <input type="password" id="password" placeholder="Digite aqui sua senha">
+
+        <label for="password">Senha:</label>
+        <input type="password" id="password" name="senha" placeholder="Digite aqui sua senha">
         <div class="error" id="passwordError"></div>
-        <input type="number" id="phone" placeholder="Digite aqui seu número de telefone">
+
+        <label for="phone">Telefone:</label>
+        <input type="text" id="phone" name="telefone" placeholder="Digite aqui seu número de telefone">
         <div class="error" id="phoneError"></div>
-        <input type="text" id="address" placeholder="Digite aqui seu endereço (opcional)">
-        <input type="text" id="company" placeholder="Digite aqui sua empresa">
+
+        <label for="address">Endereço (opcional):</label>
+        <input type="text" id="address" name="endereço" placeholder="Digite aqui seu endereço (opcional)">
+
+        <label for="company">Empresa:</label>
+        <input type="text" id="company" name="empresa" placeholder="Digite aqui sua empresa">
         <div class="error" id="companyError"></div>
-        <input type="text" id="sector" placeholder="Digite aqui seu setor">
+
+        <label for="sector">Setor:</label>
+        <input type="text" id="sector" name="setor" placeholder="Digite aqui seu setor">
         <div class="error" id="sectorError"></div>
+
         <button type="submit">Registrar</button>
     </form>
 
     <script>
+        const API_URL = 'http://localhost:3000';
+
         const form = document.getElementById('registrationForm');
 
-        form.addEventListener('submit', function (e) {
+        form.addEventListener('submit', async (e) => {
             e.preventDefault();
 
-            // Limpa os erros anteriores
+            // Limpa mensagens de erro e estilos inválidos
             document.querySelectorAll('.error').forEach(el => el.textContent = '');
+            document.querySelectorAll('input').forEach(el => el.classList.remove('invalid'));
 
             let hasError = false;
 
-            // Validação do nome
-            const name = document.getElementById('name');
-            if (name.value.trim() === '') {
-                document.getElementById('nameError').textContent = 'O nome é obrigatório.';
-                hasError = true;
-            }
+            // Função de validação
+            const validateField = (field, errorId, condition, errorMessage) => {
+                if (condition) {
+                    document.getElementById(errorId).textContent = errorMessage;
+                    field.classList.add('invalid');
+                    hasError = true;
+                }
+            };
 
-            // Validação do email
+            // Validações dos campos
+            const name = document.getElementById('name');
+            validateField(name, 'nameError', name.value.trim() === '', 'O nome é obrigatório.');
+
             const email = document.getElementById('email');
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(email.value)) {
-                document.getElementById('emailError').textContent = 'Digite um e-mail válido.';
-                hasError = true;
-            }
+            validateField(email, 'emailError', !emailRegex.test(email.value), 'Digite um e-mail válido.');
 
-            // Validação da senha
             const password = document.getElementById('password');
-            if (password.value.length < 6) {
-                document.getElementById('passwordError').textContent = 'A senha deve ter pelo menos 6 caracteres.';
-                hasError = true;
-            }
+            validateField(password, 'passwordError', password.value.length < 6, 'A senha deve ter pelo menos 6 caracteres.');
 
-            // Validação do telefone
             const phone = document.getElementById('phone');
-            if (phone.value.trim() === '' || phone.value.length < 8) {
-                document.getElementById('phoneError').textContent = 'Digite um número de telefone válido.';
-                hasError = true;
-            }
+            const phoneRegex = /^\d{8,15}$/;
+            validateField(phone, 'phoneError', !phoneRegex.test(phone.value), 'Digite um número de telefone válido.');
 
-            // Validação da empresa
             const company = document.getElementById('company');
-            if (company.value.trim() === '') {
-                document.getElementById('companyError').textContent = 'O campo empresa é obrigatório.';
-                hasError = true;
-            }
+            validateField(company, 'companyError', company.value.trim() === '', 'O campo empresa é obrigatório.');
 
-            // Validação do setor
             const sector = document.getElementById('sector');
-            if (sector.value.trim() === '') {
-                document.getElementById('sectorError').textContent = 'O campo setor é obrigatório.';
-                hasError = true;
-            }
+            validateField(sector, 'sectorError', sector.value.trim() === '', 'O campo setor é obrigatório.');
 
-            // Se não houver erros, submeta o formulário
-            if (!hasError) {
+            // Se houver erros, encerra
+            if (hasError) return;
+
+            // Monta os dados do usuário
+            const newUser = {
+                name: name.value,
+                email: email.value,
+                password: password.value,
+                phoneNumber: phone.value,
+                empresa: company.value,
+                setor: sector.value,
+            };
+
+            try {
+                const response = await fetch(`${API_URL}/users`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(newUser),
+                });
+
+                if (!response.ok) throw new Error('Erro no servidor');
+
                 alert('Registro bem-sucedido!');
                 form.reset();
+            } catch (error) {
+                alert('Erro ao registrar: ' + error.message);
             }
         });
     </script>
