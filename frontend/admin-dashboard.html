@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard CRM</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Dashboard CRM</h1>
+            <button id="logout-btn">Sair</button>
+        </header>
+        
+        <!-- Formulário para adicionar ou editar usuário -->
+        <section class="form-section">
+            <h2>Adicionar/Editar Usuário</h2>
+            <form id="crud-form">
+                <input type="text" id="name" placeholder="Nome" required>
+                <input type="email" id="email" placeholder="E-mail" required>
+                <input type="password" id="password" placeholder="Senha" required>
+                <input type="text" id="phoneNumber" placeholder="Telefone" required>
+                <input type="text" id="empresa" placeholder="Empresa">
+                <input type="text" id="setor" placeholder="Setor">
+                <button type="submit">Adicionar</button>
+            </form>
+        </section>
+
+        <!-- Tabela de usuários -->
+        <section class="table-section">
+            <h2>Lista de Usuários</h2>
+            <table id="crud-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nome</th>
+                        <th>Email</th>
+                        <th>Telefone</th>
+                        <th>Empresa</th>
+                        <th>Setor</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </section>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:3000';
+        let token = localStorage.getItem('token');
+        const form = document.getElementById('crud-form');
+        const tableBody = document.querySelector('#crud-table tbody');
+        let editingUserId = null;
+
+        // Verificar se o usuário está logado
+        if (!token) {
+            window.location.href = './login.html'; // Redireciona para a página de login
+        }
+
+        // Fetch usuários
+        async function fetchUsers() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/users`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                    },
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    renderTable(data.users);
+                } else {
+                    console.error('Erro ao buscar usuários');
+                }
+            } catch (error) {
+                console.error('Erro ao buscar usuários:', error);
+            }
+        }
+
+        // Adicionar ou editar usuário
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const user = {
+                name: document.getElementById('name').value,
+                email: document.getElementById('email').value,
+                password: document.getElementById('password').value,
+                phoneNumber: document.getElementById('phoneNumber').value,
+                empresa: document.getElementById('empresa').value,
+                setor: document.getElementById('setor').value,
+            };
+
+            try {
+                let response;
+                if (editingUserId) {
+                    response = await fetch(`${API_BASE_URL}/users/${editingUserId}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`,
+                        },
+                        body: JSON.stringify(user),
+                    });
+                } else {
+                    response = await fetch(`${API_BASE_URL}/users`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`,
+                        },
+                        body: JSON.stringify(user),
+                    });
+                }
+
+                if (response.ok) {
+                    form.reset();
+                    editingUserId = null;
+                    form.querySelector('button').textContent = 'Adicionar';
+                    fetchUsers();
+                } else {
+                    const errorData = await response.json();
+                    console.error('Erro:', errorData.message);
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+            }
+        });
+
+        // Renderizar a tabela de usuários
+        function renderTable(users) {
+            tableBody.innerHTML = '';
+            users.forEach((user) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${user._id}</td>
+                    <td>${user.name}</td>
+                    <td>${user.email}</td>
+                    <td>${user.phoneNumber}</td>
+                    <td>${user.empresa || '-'}</td>
+                    <td>${user.setor || '-'}</td>
+                    <td>
+                        <button onclick="editUser('${user._id}')">Editar</button>
+                        <button onclick="deleteUser('${user._id}')">Excluir</button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        // Editar usuário
+        async function editUser(id) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/users/${id}`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                    },
+                });
+                if (response.ok) {
+                    const user = await response.json();
+                    document.getElementById('name').value = user.name;
+                    document.getElementById('email').value = user.email;
+                    document.getElementById('phoneNumber').value = user.phoneNumber;
+                    document.getElementById('empresa').value = user.empresa || '';
+                    document.getElementById('setor').value = user.setor || '';
+                    editingUserId = id;
+                    form.querySelector('button').textContent = 'Atualizar';
+                } else {
+                    console.error('Erro ao buscar dados do usuário');
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+            }
+        }
+
+        // Deletar usuário
+        async function deleteUser(id) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/users/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                    },
+                });
+                if (response.ok) {
+                    fetchUsers();
+                } else {
+                    const errorData = await response.json();
+                    console.error('Erro ao deletar usuário:', errorData.message);
+                }
+            } catch (error) {
+                console.error('Erro ao deletar usuário:', error);
+            }
+        }
+
+        // Logout
+        document.getElementById('logout-btn').addEventListener('click', () => {
+            localStorage.removeItem('token');
+            window.location.href = './login.html';
+        });
+
+        // Carregar os usuários ao iniciar
+        fetchUsers();
+    </script>
+</body>
+</html>

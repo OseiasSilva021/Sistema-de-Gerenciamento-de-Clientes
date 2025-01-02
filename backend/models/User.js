@@ -13,11 +13,11 @@ let UserSchema = new Schema({
     },
     password: {
         type: String,
-        required: true
+        required: false
     },
     phoneNumber: {
         type: String,
-        required: true
+        required: false
     },
     endereço:{
     type: String,

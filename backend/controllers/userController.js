@@ -9,9 +9,9 @@ const bcrypt = require('bcrypt')
 const criarUsuario = async (req, res) => {
     const schema = Joi.object({
         name: Joi.string().min(3).required(),
-        email: Joi.string().email().required(),
-        password: Joi.string().min(6).required(),
-        phoneNumber: Joi.string().min(8).required(),
+        email: Joi.string().email(),
+        password: Joi.string().min(6),
+        phoneNumber: Joi.string().min(8),
         empresa: Joi.string(),
         setor: Joi.string()
     });
@@ -29,6 +29,50 @@ const criarUsuario = async (req, res) => {
         return res.status(500).json({ message: 'Erro ao criar usuário!' });
     }
 };
+
+const editaUsuariosPeloID = async (req, res) => {
+    const schema = Joi.object({
+        name: Joi.string().min(3).optional(),
+        password: Joi.string().min(6).optional(),
+        phoneNumber: Joi.string().optional(),
+        empresa: Joi.string().optional(),
+        setor: Joi.string().optional()
+    });
+
+    try {
+        const { error, value } = schema.validate(req.body, { abortEarly: false });
+
+        if (error) {
+            return res.status(400).json({
+                status: "error",
+                message: "Validação falhou!",
+                details: error.details.map(err => err.message),
+            });
+        }
+
+        const userId = req.params.id; // Pegando o ID dos parâmetros da rota
+        if (!userId) {
+            return res.status(400).json({ message: "O ID do usuário é obrigatório!" });
+        }
+
+        // Atualiza o usuário no banco de dados
+        const updatedUser = await User.findByIdAndUpdate(userId, value, { new: true });
+
+        if (!updatedUser) {
+            return res.status(404).json({ message: "Usuário não encontrado." });
+        }
+
+        // Retorna o usuário atualizado
+        return res.status(200).json({
+            message: "O usuário foi atualizado com sucesso!",
+            user: updatedUser
+        });
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ message: "Erro interno do servidor." });
+    }
+};
+
 
 
 const loginUsuario = async (req, res) => {
@@ -83,8 +127,6 @@ const loginUsuario = async (req, res) => {
     }
 };
 
-
-
 const listarUsuarios = async (req, res) => {
     try {
         const users = await User.find().select('-password'); // Exclui o campo password
@@ -94,7 +136,6 @@ const listarUsuarios = async (req, res) => {
         return res.status(500).json({ message: 'Erro ao listar usuários!' });
     }
 };
-
 
 const UpdateUsuarios = async (req, res) => {
     const schema = Joi.object({
@@ -132,9 +173,6 @@ const UpdateUsuarios = async (req, res) => {
     }
 };
 
-
-
-
 const deletaUsuario = async (req, res) => {
     const { id } = req.params;
 
@@ -154,12 +192,11 @@ const deletaUsuario = async (req, res) => {
     }
 };
 
-
-
 module.exports = {
     criarUsuario,
     listarUsuarios,
     UpdateUsuarios,
     deletaUsuario,
     loginUsuario,
+    editaUsuariosPeloID,
 }

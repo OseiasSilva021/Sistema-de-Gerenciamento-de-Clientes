@@ -119,73 +119,73 @@
             </div>
             <button type="submit" class="login-btn">Login</button>
         </form>
-       
     </div>
 
     <script>
         const API_URL = 'http://localhost:3000';
 
-const loginForm = document.getElementById('loginForm');
-const emailInput = document.getElementById('email');
-const passwordInput = document.getElementById('password');
-const emailError = document.getElementById('emailError');
-const passwordError = document.getElementById('passwordError');
+        const loginForm = document.getElementById('loginForm');
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        const emailError = document.getElementById('emailError');
+        const passwordError = document.getElementById('passwordError');
 
-loginForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
 
-    let isValid = true;
+            let isValid = true;
 
-    // Validar email
-    if (!emailInput.value.includes('@')) {
-        emailError.style.display = 'block';
-        isValid = false;
-    } else {
-        emailError.style.display = 'none';
-    }
+            // Validar email
+            if (!emailInput.value.includes('@')) {
+                emailError.style.display = 'block';
+                isValid = false;
+            } else {
+                emailError.style.display = 'none';
+            }
 
-    // Validar senha
-    if (passwordInput.value.length < 6) {
-        passwordError.style.display = 'block';
-        isValid = false;
-    } else {
-        passwordError.style.display = 'none';
-    }
+            // Validar senha
+            if (passwordInput.value.length < 6) {
+                passwordError.style.display = 'block';
+                isValid = false;
+            } else {
+                passwordError.style.display = 'none';
+            }
 
-    if (!isValid) return; // Sair se a validação falhar
+            if (!isValid) return; // Sair se a validação falhar
 
-    const user = {
-        email: emailInput.value,
-        password: passwordInput.value
-    };
+            const user = {
+                email: emailInput.value,
+                password: passwordInput.value
+            };
 
-    try {
-        const response = await fetch(`${API_URL}/login`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(user),
+            try {
+                const response = await fetch(`${API_URL}/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(user),
+                });
+
+                if (!response.ok) throw new Error('Erro no servidor');
+
+                const data = await response.json();
+
+                // Sucesso no login
+                alert('Login realizado com sucesso!');
+                loginForm.reset();
+
+                // Armazenar o token no localStorage
+                localStorage.setItem('token', data.token);
+
+                // Redirecionar com base no tipo de usuário
+                if (data.role === 'admin') {
+                    window.location.href = './admin-dashboard.html';
+                } 
+
+            } catch (error) {
+                alert('Erro ao fazer login: ' + error.message);
+            }
         });
-
-        if (!response.ok) throw new Error('Erro no servidor');
-
-        const data = await response.json();
-
-        // Sucesso no login
-        alert('Login realizado com sucesso!');
-        loginForm.reset();
-
-        // Redirecionar com base no tipo de usuário
-        if (data.role === 'admin') {
-            window.location.href = './admin-dashboard.html';
-        } else {
-            window.location.href = './user-dashboard.html';
-        }
-
-    } catch (error) {
-        alert('Erro ao fazer login: ' + error.message);
-    }
-});
-
     </script>
 </body>
 </html>
+

@@ -43,6 +43,47 @@ it('Deve realizar o login como administrador', async () => {
   expect(response.body.role).toBe('admin'); // Verifica o papel do usuário
 });
 
+it('Deve editar os dados de um usuário existente pelo ID', async () => {
+  // Cria um usuário para o teste
+  const user = await User.create({
+    name: 'João Silva',
+    email: 'joao@gmail.com',
+    password: 'senha123',
+    phoneNumber: '123456789',
+    empresa: 'Minha Empresa',
+    setor: 'TI',
+  });
+
+  // Gerar o token para o usuário criado (simulando autenticação)
+  const token = jwt.sign(
+    { id: user._id, email: user.email, name: user.name },
+    process.env.JWT_SECRET,
+    { expiresIn: '1h' }
+  );
+
+  // Dados para atualização
+  const updateData = {
+    name: 'João Silva Atualizado',
+    phoneNumber: '987654321',
+    empresa: 'Empresa Nova',
+    setor: 'Desenvolvimento',
+  };
+
+  // Chamar a rota PUT com o token gerado e os dados a serem atualizados
+  const response = await request(app)
+    .put(`/users/${user._id}`) // Aqui estamos passando o ID do usuário como parâmetro
+    .set('Authorization', `Bearer ${token}`) // Inclui o token de autenticação
+    .send(updateData); // Envia os dados para atualizar
+
+  // Validar o resultado
+  expect(response.status).toBe(200); // Status 200 de sucesso
+  expect(response.body.user.name).toBe(updateData.name); // Verifica se o nome foi atualizado
+  expect(response.body.user.phoneNumber).toBe(updateData.phoneNumber); // Verifica o número de telefone
+  expect(response.body.user.empresa).toBe(updateData.empresa); // Verifica a empresa
+  expect(response.body.user.setor).toBe(updateData.setor); // Verifica o setor
+});
+
+
 
   it('Deve atualizar os dados de um usuário existente', async () => {
     const user = await User.create({
