@@ -26,6 +26,24 @@ describe('Testes da API de Usuários', () => {
     expect(response.body.user.name).toBe(userData.name); // Verifica os dados retornados
   });
 
+  // Teste de login do administrador
+it('Deve realizar o login como administrador', async () => {
+  // Define as credenciais de admin para o teste
+  const adminEmail = 'admin@example.com';
+  const adminPassword = 'admin123'; // Certifique-se de usar a mesma senha definida no ambiente de teste
+  process.env.ADMIN_PASSWORD = adminPassword;
+
+  const response = await request(app).post('/login').send({
+    email: adminEmail,
+    password: adminPassword,
+  });
+
+  expect(response.status).toBe(200);
+  expect(response.body).toHaveProperty('token'); // Verifica se o token foi gerado
+  expect(response.body.role).toBe('admin'); // Verifica o papel do usuário
+});
+
+
   it('Deve atualizar os dados de um usuário existente', async () => {
     const user = await User.create({
       name: 'Carlos',
