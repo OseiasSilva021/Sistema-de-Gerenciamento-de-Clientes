@@ -31,13 +31,15 @@ const criarUsuario = async (req, res) => {
 };
 
 const editaUsuariosPeloID = async (req, res) => {
+    console.log('Requisição recebida para editar o usuário:', req.body);
     const schema = Joi.object({
         name: Joi.string().min(3).optional(),
-        password: Joi.string().min(6).optional(),
+        email: Joi.string().email().optional(),  // Tornando o email opcional para edição
         phoneNumber: Joi.string().optional(),
         empresa: Joi.string().optional(),
         setor: Joi.string().optional()
     });
+    
 
     try {
         const { error, value } = schema.validate(req.body, { abortEarly: false });
@@ -50,7 +52,7 @@ const editaUsuariosPeloID = async (req, res) => {
             });
         }
 
-        const userId = req.params.id; // Pegando o ID dos parâmetros da rota
+        const userId = req.params.id;
         if (!userId) {
             return res.status(400).json({ message: "O ID do usuário é obrigatório!" });
         }
@@ -62,7 +64,6 @@ const editaUsuariosPeloID = async (req, res) => {
             return res.status(404).json({ message: "Usuário não encontrado." });
         }
 
-        // Retorna o usuário atualizado
         return res.status(200).json({
             message: "O usuário foi atualizado com sucesso!",
             user: updatedUser
@@ -72,6 +73,59 @@ const editaUsuariosPeloID = async (req, res) => {
         return res.status(500).json({ message: "Erro interno do servidor." });
     }
 };
+
+
+const updateUser = async (req, res) => {
+    const schema = Joi.object({
+        name: Joi.string().min(3).optional(),
+        email: Joi.string().email().optional(),  // Tornando o email opcional para edição
+        phoneNumber: Joi.string().optional(),
+        empresa: Joi.string().optional(),
+        setor: Joi.string().optional()
+    });
+
+    // Validar os dados recebidos no corpo da requisição
+    const { error, value } = schema.validate(req.body);
+    if (error) {
+        return res.status(400).json({
+            message: error.details[0].message
+        });
+    }
+
+    const userId = req.params.id; // Pegando o ID dos parâmetros da rota
+
+    // Validar o formato do ID
+    if (!userId.match(/^[0-9a-fA-F]{24}$/)) { // Verificando se o ID é válido
+        return res.status(400).json({ message: 'ID inválido!' });
+    }
+
+    try {
+        // Verifica se o e-mail foi alterado e se já existe outro usuário com o mesmo e-mail
+        if (value.email) {
+            const existingUser = await User.findOne({ email: value.email });
+            if (existingUser && existingUser._id.toString() !== userId) {
+                return res.status(400).json({ message: 'E-mail já cadastrado!' });
+            }
+        }
+
+        // Atualizando o usuário com os dados validados
+        const updatedUser = await User.findByIdAndUpdate(userId, value, { new: true });
+
+        if (!updatedUser) {
+            return res.status(404).json({ message: 'Usuário não encontrado!' });
+        }
+
+        return res.status(200).json({
+            message: 'Usuário atualizado com sucesso!',
+            user: updatedUser,
+        });
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ message: 'Erro ao atualizar usuário!' });
+    }
+};
+
+
 
 
 
@@ -199,4 +253,5 @@ module.exports = {
     deletaUsuario,
     loginUsuario,
     editaUsuariosPeloID,
+    updateUser,
 }
