@@ -30,6 +30,14 @@ let UserSchema = new Schema({
     setor: {
         type: String,
         required: false
+    },
+    role: { 
+        type: String, 
+        default: "user" // "user" ou "admin"
+    }, 
+    ultimoContato: {
+        type: String,
+        required: false
     }
 })
 

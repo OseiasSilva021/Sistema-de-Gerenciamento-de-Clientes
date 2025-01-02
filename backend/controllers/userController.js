@@ -45,6 +45,21 @@ const loginUsuario = async (req, res) => {
     const { email, password } = req.body;
 
     try {
+        // Credenciais do admin pré-definidas
+        const adminEmail = "admin@example.com";
+        const adminPassword = process.env.ADMIN_PASSWORD; // Sempre armazene em variáveis de ambiente
+
+        // Verifica se o login é de um administradord 
+        if (email === adminEmail && password === adminPassword) {
+            const adminToken = jwt.sign(
+                { email, role: "admin" },
+                process.env.JWT_SECRET,
+                { expiresIn: '1h' }
+            );
+            return res.status(200).json({ token: adminToken, role: "admin" });
+        }
+
+        // Login de usuários normais
         const user = await User.findOne({ email });
         if (!user) {
             return res.status(400).json({ message: 'Usuário não encontrado!' });
@@ -56,17 +71,18 @@ const loginUsuario = async (req, res) => {
         }
 
         const token = jwt.sign(
-            { id: user._id, email: user.email, name: user.name },
+            { id: user._id, email: user.email, name: user.name, role: "user" },
             process.env.JWT_SECRET,
             { expiresIn: '1h' }
         );
 
-        return res.status(200).json({ token });
+        return res.status(200).json({ token, role: "user" });
     } catch (err) {
         console.error(err);
         return res.status(500).json({ message: 'Erro ao fazer login!' });
     }
 };
+
 
 
 const listarUsuarios = async (req, res) => {
