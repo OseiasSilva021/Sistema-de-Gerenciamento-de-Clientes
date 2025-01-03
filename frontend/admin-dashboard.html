@@ -43,6 +43,16 @@
                 <button type="submit">Editar</button>
             </form>
         </section>
+        <section class="form-section">
+            <h2>Anotações sobre Usuários</h2>
+            <form id="anota-form">
+                <input type="text" id="anotaID" placeholder="ID do Usuário" disabled>
+                <input type="text" id="anotaname" placeholder="Nome" disabled>
+                <input type="email" id="anotaemail" placeholder="E-mail" disabled>
+                <textarea name="anota" id="anota"></textarea>
+                <button type="submit">Enviar</button>
+            </form>
+        </section>
 
         <!-- Tabela de usuários -->
         <section class="table-section">
@@ -80,6 +90,7 @@
         let token = localStorage.getItem('token');
         const addForm = document.getElementById('add-form');
         const editForm = document.getElementById('edit-form');
+        const anotaForm = document.getElementById('anota-form');
         const tableBody = document.querySelector('#crud-table tbody');
 
         // Verificar se o usuário está logado
@@ -176,7 +187,38 @@
         console.error('Erro:', error);
     }
 });
+ 
 
+        anotaForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const userId = document.getElementById('anotaID').value;
+            const notes = {
+                description: document.getElementById("anota").value,
+                user: userId,
+                email: document.getElementById('anotaemail').value,
+                name: document.getElementById('anotaname').value
+            }
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/notes`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(notes),
+        });
+
+        if (response.ok) {
+            anotaForm.reset();
+            fetchUsers(); // Recarregar a lista de usuários
+        } else {
+            const errorData = await response.json();
+            console.error('Erro:', errorData.message);
+        }
+    } catch (error) {
+        console.error('Erro:', error);
+    }
+});
 
         // Renderizar a tabela de usuários
         function renderTable(users) {
@@ -193,6 +235,7 @@
                   <td>${formatarDataBR(user.ultimoContato)}</td>
                   <td>${user.status}</td>
                     <td>
+                        <button onclick="anotaUser('${user._id}')">Anotar</button>
                         <button onclick="editUser('${user._id}')">Editar</button>
                         <button onclick="deleteUser('${user._id}')">Excluir</button>
                     </td>
@@ -219,6 +262,28 @@
             document.getElementById('editsetor').value = user.setor
             document.getElementById('editultimoContato').value = user.ultimoContato
             document.getElementById('editstatus').value = user.status
+            
+        } else {
+            console.error('Erro ao buscar dados do usuário');
+        }
+    } catch (error) {
+        console.error('Erro:', error);
+    }
+}
+
+        async function anotaUser(userId) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/users/profile/${userId}`, {
+                    method: 'GET' 
+                });
+
+                if (response.ok) {
+                    const { user } = await response.json(); 
+
+     
+            document.getElementById('anotaID').value = user._id;
+            document.getElementById('anotaname').value = user.name;
+            document.getElementById('anotaemail').value = user.email;
             
         } else {
             console.error('Erro ao buscar dados do usuário');
