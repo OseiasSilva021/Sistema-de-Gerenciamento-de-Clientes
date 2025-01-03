@@ -4,8 +4,6 @@ const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt')
 
 
-
-
 const criarUsuario = async (req, res) => {
     const schema = Joi.object({
         name: Joi.string().min(3).required(),
@@ -13,7 +11,8 @@ const criarUsuario = async (req, res) => {
         password: Joi.string().min(6),
         phoneNumber: Joi.string().min(8),
         empresa: Joi.string(),
-        setor: Joi.string()
+        setor: Joi.string().optional(),
+        ultimoContato: Joi.string().optional()
     });
 
     const { error } = schema.validate(req.body);
@@ -37,7 +36,8 @@ const editaUsuariosPeloID = async (req, res) => {
         email: Joi.string().email().optional(),  // Tornando o email opcional para edição
         phoneNumber: Joi.string().optional(),
         empresa: Joi.string().optional(),
-        setor: Joi.string().optional()
+        setor: Joi.string().optional(),
+        ultimoContato: Joi.string().optional()
     });
     
 
@@ -74,14 +74,14 @@ const editaUsuariosPeloID = async (req, res) => {
     }
 };
 
-
 const updateUser = async (req, res) => {
     const schema = Joi.object({
         name: Joi.string().min(3).optional(),
         email: Joi.string().email().optional(),  // Tornando o email opcional para edição
         phoneNumber: Joi.string().optional(),
         empresa: Joi.string().optional(),
-        setor: Joi.string().optional()
+        setor: Joi.string().optional(),
+        ultimoContato: Joi.string().optional()
     });
 
     // Validar os dados recebidos no corpo da requisição
@@ -124,10 +124,6 @@ const updateUser = async (req, res) => {
         return res.status(500).json({ message: 'Erro ao atualizar usuário!' });
     }
 };
-
-
-
-
 
 const loginUsuario = async (req, res) => {
     const schema = Joi.object({
@@ -197,7 +193,8 @@ const UpdateUsuarios = async (req, res) => {
         password: Joi.string().min(6),
         phoneNumber: Joi.string(),
         empresa: Joi.string(),
-        setor: Joi.string(),
+        setor: Joi.string().optional(),
+        ultimoContato: Joi.string().optional()
     });
 
     const { error } = schema.validate(req.body);

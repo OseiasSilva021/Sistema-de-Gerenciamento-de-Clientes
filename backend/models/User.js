@@ -38,6 +38,10 @@ let UserSchema = new Schema({
     ultimoContato: {
         type: String,
         required: false
+    },
+    status: {
+        type: String,
+        required: false
     }
 })
 
