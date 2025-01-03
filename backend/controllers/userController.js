@@ -12,7 +12,8 @@ const criarUsuario = async (req, res) => {
         phoneNumber: Joi.string().min(8),
         empresa: Joi.string(),
         setor: Joi.string().optional(),
-        ultimoContato: Joi.string().optional()
+        ultimoContato: Joi.string().optional(),
+        status: Joi.string().optional()
     });
 
     const { error } = schema.validate(req.body);
@@ -37,7 +38,8 @@ const editaUsuariosPeloID = async (req, res) => {
         phoneNumber: Joi.string().optional(),
         empresa: Joi.string().optional(),
         setor: Joi.string().optional(),
-        ultimoContato: Joi.string().optional()
+        ultimoContato: Joi.string().optional(),
+        status: Joi.string().optional()
     });
     
 
@@ -81,7 +83,8 @@ const updateUser = async (req, res) => {
         phoneNumber: Joi.string().optional(),
         empresa: Joi.string().optional(),
         setor: Joi.string().optional(),
-        ultimoContato: Joi.string().optional()
+        ultimoContato: Joi.string().optional(),
+        status: Joi.string().optional()
     });
 
     // Validar os dados recebidos no corpo da requisição
@@ -194,7 +197,8 @@ const UpdateUsuarios = async (req, res) => {
         phoneNumber: Joi.string(),
         empresa: Joi.string(),
         setor: Joi.string().optional(),
-        ultimoContato: Joi.string().optional()
+        ultimoContato: Joi.string().optional(),
+        status: Joi.string().optional()
     });
 
     const { error } = schema.validate(req.body);

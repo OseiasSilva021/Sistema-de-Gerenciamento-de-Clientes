@@ -23,6 +23,7 @@
                 <input type="text" id="empresa" placeholder="Empresa">
                 <input type="text" id="setor" placeholder="Setor">
                 <input type="date" id="ultimoContato" placeholder="Último Contato">
+                <input type="text" id="status" placeholder="Status">
                 <button type="submit">Adicionar</button>
             </form>
         </section>
@@ -38,6 +39,7 @@
                 <input type="text" id="editempresa" placeholder="Empresa">
                 <input type="text" id="editsetor" placeholder="Setor">
                 <input type="date" id="editultimoContato" placeholder="Último Contato">
+                <input type="text" id="editstatus" placeholder="Status">
                 <button type="submit">Editar</button>
             </form>
         </section>
@@ -55,6 +57,7 @@
                         <th>Empresa</th>
                         <th>Setor</th>
                         <th>Último Contato</th>
+                        <th>Status</th>
                         <th>Ações</th>
                         
                     </tr>
@@ -114,6 +117,7 @@
                 empresa: document.getElementById('empresa').value,
                 setor: document.getElementById('setor').value,
                 ultimoContato: document.getElementById('ultimoContato').value,
+                status: document.getElementById('status').value,
             };
 
             try {
@@ -149,6 +153,7 @@
         empresa: document.getElementById('editempresa').value,
         setor: document.getElementById('editsetor').value,
         ultimoContato: document.getElementById('editultimoContato').value,
+        status: document.getElementById('editstatus').value,
     };
 
     try {
@@ -186,6 +191,7 @@
                     <td>${user.empresa || '-'}</td>
                     <td>${user.setor || '-'}</td>
                   <td>${formatarDataBR(user.ultimoContato)}</td>
+                  <td>${user.status}</td>
                     <td>
                         <button onclick="editUser('${user._id}')">Editar</button>
                         <button onclick="deleteUser('${user._id}')">Excluir</button>
@@ -212,6 +218,7 @@
             document.getElementById('editempresa').value = user.empresa
             document.getElementById('editsetor').value = user.setor
             document.getElementById('editultimoContato').value = user.ultimoContato
+            document.getElementById('editstatus').value = user.status
             
         } else {
             console.error('Erro ao buscar dados do usuário');
