@@ -13,7 +13,8 @@ const criarUsuario = async (req, res) => {
         empresa: Joi.string(),
         setor: Joi.string().optional(),
         ultimoContato: Joi.string().optional(),
-        status: Joi.string().optional()
+        status: Joi.string().optional(),
+        notes: Joi.string().optional(),
     });
 
     const { error } = schema.validate(req.body);
@@ -39,7 +40,8 @@ const editaUsuariosPeloID = async (req, res) => {
         empresa: Joi.string().optional(),
         setor: Joi.string().optional(),
         ultimoContato: Joi.string().optional(),
-        status: Joi.string().optional()
+        status: Joi.string().optional(),
+        notes: Joi.string().optional(),
     });
     
 
@@ -84,7 +86,8 @@ const updateUser = async (req, res) => {
         empresa: Joi.string().optional(),
         setor: Joi.string().optional(),
         ultimoContato: Joi.string().optional(),
-        status: Joi.string().optional()
+        status: Joi.string().optional(),
+        notes: Joi.string().optional(),
     });
 
     // Validar os dados recebidos no corpo da requisição
@@ -198,7 +201,8 @@ const UpdateUsuarios = async (req, res) => {
         empresa: Joi.string(),
         setor: Joi.string().optional(),
         ultimoContato: Joi.string().optional(),
-        status: Joi.string().optional()
+        status: Joi.string().optional(),
+        notes: Joi.string().optional(),
     });
 
     const { error } = schema.validate(req.body);

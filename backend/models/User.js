@@ -42,7 +42,11 @@ let UserSchema = new Schema({
     status: {
         type: String,
         required: false
-    }
+    },
+    notes: {
+        type: String,
+        required: false
+    },
 })
 
 UserSchema.pre('save', async function (next) {
