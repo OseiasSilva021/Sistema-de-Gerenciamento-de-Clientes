@@ -105,10 +105,6 @@
         <input type="email" id="email" name="email" placeholder="Digite aqui seu email">
         <div class="error" id="emailError"></div>
 
-        <label for="password">Senha:</label>
-        <input type="password" id="password" name="senha" placeholder="Digite aqui sua senha">
-        <div class="error" id="passwordError"></div>
-
         <label for="phone">Telefone:</label>
         <input type="text" id="phone" name="telefone" placeholder="Digite aqui seu número de telefone">
         <div class="error" id="phoneError"></div>
@@ -158,8 +154,6 @@
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             validateField(email, 'emailError', !emailRegex.test(email.value), 'Digite um e-mail válido.');
 
-            const password = document.getElementById('password');
-            validateField(password, 'passwordError', password.value.length < 6, 'A senha deve ter pelo menos 6 caracteres.');
 
             const phone = document.getElementById('phone');
             const phoneRegex = /^\d{8,15}$/;
@@ -178,7 +172,6 @@
             const newUser = {
                 name: name.value,
                 email: email.value,
-                password: password.value,
                 phoneNumber: phone.value,
                 empresa: company.value,
                 setor: sector.value,
