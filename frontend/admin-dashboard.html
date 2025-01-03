@@ -48,27 +48,11 @@
 
 
         <!-- Tabela de usuários -->
-        <section class="table-section">
+        <section class="users-list-section">
             <h2>Lista de Usuários</h2>
-            <table id="crud-table">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Nome</th>
-                        <th>Email</th>
-                        <th>Telefone</th>
-                        <th>Empresa</th>
-                        <th>Setor</th>
-                        <th>Último Contato</th>
-                        <th>Status</th>
-                        <th>Anotações</th>
-                        <th>Ações</th>
-                        
-                    </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
+            <div id="users-list"></div>
         </section>
+        
     </div>
 
     <script>
@@ -191,27 +175,33 @@
 
         // Renderizar a tabela de usuários
         function renderTable(users) {
-            tableBody.innerHTML = '';
-            users.forEach((user) => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${user._id}</td>
-                    <td>${user.name}</td>
-                    <td>${user.email}</td>
-                    <td>${user.phoneNumber}</td>
-                    <td>${user.empresa || '-'}</td>
-                    <td>${user.setor || '-'}</td>
-                  <td>${formatarDataBR(user.ultimoContato)}</td>
-                  <td>${user.status}</td>
-                  <td>${user.notes}</td>
-                    <td>
-                        <button onclick="editUser('${user._id}')">Editar</button>
-                        <button onclick="deleteUser('${user._id}')">Excluir</button>
-                    </td>
-                `;
-                tableBody.appendChild(row);
-            });
-        }
+    const usersList = document.getElementById('users-list');
+    usersList.innerHTML = ''; // Limpa a lista de usuários antes de renderizar
+
+    users.forEach((user) => {
+        const userCard = document.createElement('div');
+        userCard.classList.add('user-card');
+
+        userCard.innerHTML = `
+            <h3>${user.name}</h3>
+            <p><strong>ID:</strong> ${user._id}</p>
+            <p><strong>Email:</strong> ${user.email}</p>
+            <p><strong>Telefone:</strong> ${user.phoneNumber}</p>
+            <p><strong>Empresa:</strong> ${user.empresa || '-'}</p>
+            <p><strong>Setor:</strong> ${user.setor || '-'}</p>
+            <p><strong>Último Contato:</strong> ${formatarDataBR(user.ultimoContato)}</p>
+            <p><strong>Status:</strong> ${user.status}</p>
+            <p><strong>Anotações:</strong> ${user.notes}</p>
+            <div class="actions">
+                <button onclick="editUser('${user._id}')">Editar</button>
+                <button onclick="deleteUser('${user._id}')">Excluir</button>
+            </div>
+        `;
+
+        usersList.appendChild(userCard);
+    });
+}
+
 
         async function editUser(userId) {
     try {
