@@ -54,10 +54,19 @@
         </section>
         
     </div>
+    <div id="feedback" class="hidden"></div>
+
 
     <script>
 
 
+        function showFeedback(message, isSuccess = true) {
+            const feedback = document.getElementById('feedback');
+            feedback.textContent = message;
+            feedback.className = `feedback ${isSuccess ? 'success' : 'error'}`;
+            feedback.classList.remove('hidden');
+            setTimeout(() => feedback.classList.add('hidden'), 3000); // Esconde após 3 segundos
+        }
 
 
 
@@ -90,12 +99,14 @@
                     },
                 });
                 if (response.ok) {
+                    
                     const data = await response.json();
                     renderTable(data.users);
                 } else {
-                    console.error('Erro ao buscar usuários');
+                    showFeedback('Erro ao buscar usuários.', false);
                 }
             } catch (error) {
+                showFeedback('Erro ao adicionar usuário.', false);
                 console.error('Erro ao buscar usuários:', error);
             }
         }
@@ -125,9 +136,11 @@
                 });
 
                 if (response.ok) {
+                    showFeedback('Usuário adicionado com sucesso!', true);
                     addForm.reset();
                     fetchUsers(); // Recarregar a lista de usuários
                 } else {
+                    showFeedback('Erro ao adicionar usuário.', false);
                     const errorData = await response.json();
                     console.error('Erro:', errorData.message);
                 }
@@ -161,6 +174,7 @@
         });
 
         if (response.ok) {
+            showFeedback('Usuário editado com sucesso!', true);
             editForm.reset();
             fetchUsers(); // Recarregar a lista de usuários
         } else {
@@ -242,6 +256,7 @@
                     },
                 });
                 if (response.ok) {
+                    showFeedback('Usuário deletado com sucesso!', true);
                     fetchUsers();
                 } else {
                     const errorData = await response.json();
