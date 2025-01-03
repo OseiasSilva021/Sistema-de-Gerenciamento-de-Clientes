@@ -25,13 +25,13 @@
                 <input type="date" id="ultimoContato" placeholder="Último Contato">
                 <input type="text" id="status" placeholder="Status">
                 <input type="text" id="anotacoes" placeholder="Anotações">
-                <button type="submit">Adicionar</button>
+                <button type="submit" id="edit">Adicionar</button>
             </form>
         </section>
 
         <!-- Formulário para editar usuário -->
         <section class="form-section">
-            <h2>Editar Usuário</h2>
+            <h2 >Editar Usuário</h2>
             <form id="edit-form">
                 <input type="text" id="editID" placeholder="ID do Usuário" disabled>
                 <input type="text" id="editname" placeholder="Nome" >
@@ -152,6 +152,7 @@
         // Editar usuário
         editForm.addEventListener('submit', async (e) => {
     e.preventDefault();
+    
     const userId = document.getElementById('editID').value;
     const user = {
         name: document.getElementById('editname').value,
@@ -207,7 +208,7 @@
             <p><strong>Status:</strong> ${user.status}</p>
             <p><strong>Anotações:</strong> ${user.notes}</p>
             <div class="actions">
-                <button onclick="editUser('${user._id}')">Editar</button>
+               <a href="#edit"><button onclick="editUser('${user._id}')">Editar</button></a> 
                 <button onclick="deleteUser('${user._id}')">Excluir</button>
             </div>
         `;
