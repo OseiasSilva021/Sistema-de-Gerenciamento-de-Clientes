@@ -31,6 +31,29 @@ const criarUsuario = async (req, res) => {
     }
 };
 
+const pesquisaUsuario = async (req, res) => {
+    const { search } = req.query; // Obtém o termo de busca da query string
+
+    try {
+        // Filtro básico
+        const query = search
+            ? {
+                $or: [
+                    { name: { $regex: search, $options: 'i' } }, // Busca por nome
+                    { email: { $regex: search, $options: 'i' } } // Busca por e-mail
+                ]
+            }
+            : {};
+
+        // Buscar usuários no banco
+        const users = await User.find(query);
+        res.json({ success: true, users });
+    } catch (error) {
+        console.error('Erro ao buscar usuários:', error);
+        res.status(500).json({ success: false, message: 'Erro ao buscar usuários' });
+    }
+};
+
 const editaUsuariosPeloID = async (req, res) => {
     console.log('Requisição recebida para editar o usuário:', req.body);
     const schema = Joi.object({
@@ -147,7 +170,7 @@ const loginUsuario = async (req, res) => {
     try {
         // Credenciais do admin pré-definidas
         const adminEmail = "admin@example.com";
-        const adminPassword = process.env.ADMIN_PASSWORD; // Sempre armazene em variáveis de ambiente
+        const adminPassword = "admin123"; // Sempre armazene em variáveis de ambiente
 
         // Verifica se o login é de um administradord 
         if (email === adminEmail && password === adminPassword) {
@@ -259,4 +282,5 @@ module.exports = {
     loginUsuario,
     editaUsuariosPeloID,
     updateUser,
+    pesquisaUsuario,
 }

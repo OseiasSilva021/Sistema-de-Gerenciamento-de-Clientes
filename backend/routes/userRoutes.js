@@ -1,4 +1,4 @@
-const { criarUsuario, listarUsuarios, UpdateUsuarios, deletaUsuario, loginUsuario, editaUsuariosPeloID , updateUser } = require('../controllers/userController');
+const { criarUsuario, listarUsuarios, UpdateUsuarios, deletaUsuario, loginUsuario, editaUsuariosPeloID , updateUser, pesquisaUsuario } = require('../controllers/userController');
 const autenticaToken = require('../middlewares/authMiddleware');
 const express = require('express');
 
@@ -6,6 +6,7 @@ const router = express.Router()
 
 router.get('/users', listarUsuarios) // lista todos os usuários
 router.post('/users', criarUsuario) //  cria usuários
+router.get('/users/pesquisa', pesquisaUsuario) // pesquisa usuário
 router.post('/login', loginUsuario)
 router.get('/users/profile/:id', updateUser)
 router.put('/update', autenticaToken, UpdateUsuarios)

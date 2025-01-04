@@ -16,7 +16,7 @@ db;
 app.use(userRoutes)
 
 
-app.listen(process.env.PORT, () => {
+app.listen(3000, () => {
     console.log("O servidor ta rodando na porta 3000, irmão!")
 })
 

@@ -50,6 +50,7 @@
         <!-- Tabela de usuários -->
         <section class="users-list-section">
             <h2>Lista de Usuários</h2>
+            <input type="text" id="search-bar" placeholder="Buscar usuários...">
             <div id="users-list"></div>
         </section>
         
@@ -59,6 +60,7 @@
 
     <script>
 
+            
 
         function showFeedback(message, isSuccess = true) {
             const feedback = document.getElementById('feedback');
@@ -88,6 +90,26 @@
         if (!token) {
             window.location.href = './login.html'; // Redireciona para a página de login
         }
+
+
+        async function searchUsers(query) {
+    try {
+        const response = await fetch(`${API_BASE_URL}/users/pesquisa?search=${query}`, {
+            headers: { 'Authorization': `Bearer ${token}` },
+        });
+        if (response.ok) {
+            const { users } = await response.json();
+            renderTable(users);
+        }
+    } catch (error) {
+        console.error('Erro ao buscar usuários:', error);
+    }
+}
+
+document.getElementById('search-bar').addEventListener('input', (e) => {
+    searchUsers(e.target.value);
+});
+
 
         // Fetch usuários
         async function fetchUsers() {
