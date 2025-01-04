@@ -40,7 +40,8 @@ const pesquisaUsuario = async (req, res) => {
             ? {
                 $or: [
                     { name: { $regex: search, $options: 'i' } }, // Busca por nome
-                    { email: { $regex: search, $options: 'i' } } // Busca por e-mail
+                    { email: { $regex: search, $options: 'i' } },
+                    { status: { $regex: search, $options: 'i' } }  // Busca por e-mail
                 ]
             }
             : {};
