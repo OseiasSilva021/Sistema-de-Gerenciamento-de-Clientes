@@ -51,12 +51,17 @@
         <section class="users-list-section">
             <h2>Lista de Usuários</h2>
             <input type="text" id="search-bar" placeholder="Buscar usuários...">
+            <button id="export-csv-btn">Exportar para CSV</button>
+            <button id="export-excel-btn">Exportar para Excel</button>
             <div id="users-list"></div>
         </section>
         
     </div>
     <div id="feedback" class="hidden"></div>
 
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    
 
     <script>
 
@@ -132,6 +137,80 @@ document.getElementById('search-bar').addEventListener('input', (e) => {
                 console.error('Erro ao buscar usuários:', error);
             }
         }
+
+
+        function exportToCSV(users) {
+    const headers = ['ID', 'Nome', 'Email', 'Telefone', 'Empresa', 'Setor', 'Último Contato', 'Status', 'Anotações'];
+    const rows = users.map(user => [
+        user._id,
+        user.name,
+        user.email,
+        user.phoneNumber,
+        user.empresa || '',
+        user.setor || '',
+        formatarDataBR(user.ultimoContato),
+        user.status || '',
+        user.notes || ''
+    ]);
+
+    const csvContent = [headers, ...rows]
+        .map(row => row.map(cell => `"${cell}"`).join(','))
+        .join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'usuarios.csv';
+    link.click();
+}
+
+
+        function exportToExcel(users) {
+                const worksheet = XLSX.utils.json_to_sheet(users.map(user => ({
+                    ID: user._id,
+                    Nome: user.name,
+                    Email: user.email,
+                    Telefone: user.phoneNumber,
+                    Empresa: user.empresa || '',
+                    Setor: user.setor || '',
+                    'Último Contato': formatarDataBR(user.ultimoContato),
+                    Status: user.status || '',
+                    Anotações: user.notes || ''
+                })));
+                
+                const workbook = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(workbook, worksheet, 'Usuários');
+                
+                XLSX.writeFile(workbook, 'usuarios.xlsx');
+            }
+
+            document.getElementById('export-csv-btn').addEventListener('click', async () => {
+    const response = await fetch(`${API_BASE_URL}/users`, {
+        method: 'GET',
+        headers: { 'Authorization': `Bearer ${token}` },
+    });
+    if (response.ok) {
+        const { users } = await response.json();
+        exportToCSV(users);
+    } else {
+        showFeedback('Erro ao exportar dados.', false);
+    }
+});
+
+            document.getElementById('export-excel-btn').addEventListener('click', async () => {
+                const response = await fetch(`${API_BASE_URL}/users`, {
+                    method: 'GET',
+                    headers: { 'Authorization': `Bearer ${token}` },
+                });
+                if (response.ok) {
+                    const { users } = await response.json();
+                    exportToExcel(users);
+                } else {
+                    showFeedback('Erro ao exportar dados.', false);
+                }
+            });
+
+
 
         // Adicionar usuário
         addForm.addEventListener('submit', async (e) => {
